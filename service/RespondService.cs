@@ -9,7 +9,7 @@ public static class RespondService
             return;
         }
         try{
-            await Connection.InvokeAsync("ReceiveFileFromAgent", fileName, fileContent);
+            await Connection.InvokeAsync("SendFileToWeb", fileName, fileContent);
             Console.WriteLine($"Sent file to web: {fileName}");
         }
         catch (Exception ex)

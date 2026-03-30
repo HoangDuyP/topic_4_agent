@@ -2,19 +2,19 @@ public static class FileService
 {
     public static async Task GetFile(string fileName)
     {
-        DriveInfo[] allDrives = DriveInfo.GetDrives(); // Get all disk drives
+        DriveInfo[] allDrives = DriveInfo.GetDrives(); 
         foreach (var drive in allDrives)
         {
-            if (!drive.IsReady || drive.DriveType != DriveType.Fixed) continue; // Skip if drive is not ready, or not a fixed drive
+            if (!drive.IsReady || drive.DriveType != DriveType.Fixed) continue; 
             try
             {
                 var options = new EnumerationOptions
                 {
-                    RecurseSubdirectories = true, // Search in subdirectories
-                    IgnoreInaccessible = true, // Ignore inaccessible directories
+                    RecurseSubdirectories = true, 
+                    IgnoreInaccessible = true, 
                     MatchCasing = MatchCasing.CaseInsensitive
                 };
-                var filePath = Directory.EnumerateFiles(drive.RootDirectory.FullName, fileName, options).FirstOrDefault(); // Find and return the first found file
+                var filePath = Directory.EnumerateFiles(drive.RootDirectory.FullName, fileName, options).FirstOrDefault();
                 if (filePath != null)
                 {
                     Console.WriteLine($"File found: {filePath}");
@@ -45,7 +45,6 @@ public static class FileService
                 var bytes = File.ReadAllBytes(fileInfo.FullName);
                 var base64 = Convert.ToBase64String(bytes);
                 await RespondService.SendFileToWeb(fileInfo.Name, base64);
-
             }
             else
             {
@@ -56,5 +55,14 @@ public static class FileService
         {
             await RespondService.SendMessageToWeb("Error accessing file: " + path + " - " + ex.Message);
         }
+    }
+    public static async Task MadeTextFile(string content)
+    {
+        string filePath = Path.Combine(Path.GetTempPath(), "output.txt");
+        File.WriteAllText(filePath, content);
+        var fileInfo = new FileInfo(filePath);
+        var bytes = File.ReadAllBytes(fileInfo.FullName); 
+        var base64 = Convert.ToBase64String(bytes);
+        await RespondService.SendFileToWeb(fileInfo.Name, base64);
     }
 }

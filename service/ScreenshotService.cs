@@ -19,9 +19,9 @@ public static class ScreenshotService
         Rectangle captureRectangle = Screen.AllScreens[0].Bounds; 
         Graphics captureGraphics = Graphics.FromImage(captureBitmap);
         captureGraphics.CopyFromScreen(captureRectangle.Left, captureRectangle.Top, 0, 0, captureRectangle.Size);
-        string path = Path.Combine(Path.GetTempPath(), "Capture.png");
-        captureBitmap.Save(path, ImageFormat.Png);
+        string path = Path.Combine(Path.GetTempPath(), "Capture.jpg");
+        captureBitmap.Save(path, ImageFormat.Jpeg);
         await FileService.GetFileByPath(path);
-        File.Delete(path); // Delete the temporary file
+        File.Delete(path); 
     }
 }

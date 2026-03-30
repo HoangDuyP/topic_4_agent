@@ -1,49 +1,50 @@
 using System.Diagnostics;
 public static class ProcessService
 {
-    public static void ListAllProcess()
+    public static async Task ListAllProcess()
     {
         var processes = Process.GetProcesses();
-        //EmailService.SendResultLAN("Process Service", "Listing all processes: " + string.Join("\n", processes.Select(p => $"{p.ProcessName} (ID: {p.Id})")));
+        string processList = string.Join("\n", processes.Select(p => $"{p.ProcessName} (ID: {p.Id})"));
+        await FileService.MadeTextFile(processList);
     }
-    public static void KillProcessByName(string processName)
+    public static async Task KillProcessByName(string processName)
     {
         try
         {
-            var processes = Process.GetProcessesByName(processName); // Create an array of type Process that represents the process resources running the specified appName
+            var processes = Process.GetProcessesByName(processName); 
             if(processes.Length == 0)
             {
-                //EmailService.SendResultLAN("Process Service", "No process found with name: " + processName);
+                await RespondService.SendMessageToWeb("Process not found: " + processName);
                 return;
             }
             foreach (var process in processes)
             {
                 try
                 {
-                    process.Kill(true); // Kill the process and its children
+                    process.Kill(true); 
                 }
                 catch (Exception ex)
                 {
-                    //EmailService.SendResultLAN("Process Service", "Error while trying to kill process: " + ex.Message);
+                    await RespondService.SendMessageToWeb("Error while trying to kill process: " + ex.Message);
                 }
             }
-            //EmailService.SendResultLAN("Process Service", "Stopped process: " + processName);
+            await RespondService.SendMessageToWeb("Process stopped: " + processName);
         }
         catch(Exception ex)
         {
-            //EmailService.SendResultLAN("Process Service", "Error while trying to kill process: " + ex.Message);
+            await RespondService.SendMessageToWeb("Error while trying to kill process: " + ex.Message);
             return;
         }
     }
-    public static void StartProcessByName(string processName)
+    public static async Task StartProcessByName(string processName)
     {
         try
         {
-            AppService.StartApp(processName);
+            await AppService.StartApp(processName);
         }
         catch (Exception ex)
         {
-            //EmailService.SendResultLAN("Process Service", "Error while trying to start process: " + ex.Message);
+            await RespondService.SendMessageToWeb("Error while trying to start process: " + ex.Message);
         }
     }
 

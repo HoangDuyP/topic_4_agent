@@ -17,7 +17,7 @@ try
         }
         else
         {
-            CommandHandler.HandleCommand(msg);
+            await CommandHandler.HandleCommand(msg);
         }
     });
     await connection.StartAsync();

@@ -2,38 +2,55 @@ using System.Diagnostics;
 
 public static class AppService
 {
-    public static void StopApp(string appName)
+        public static async Task ListAllApps()
+    {
+        var apps = Process.GetProcesses().Where(p =>
     {
         try
         {
-            var processes = Process.GetProcessesByName(appName); // Create an array of type Process that represents the process resources running the specified appName
+            return p.MainWindowHandle != IntPtr.Zero &&
+                   !string.IsNullOrEmpty(p.MainWindowTitle);
+        }
+        catch
+        {
+            return false;
+        }
+    });
+        string appList = string.Join("\n", apps.Select(p => $"{p.ProcessName} (ID: {p.Id})"));
+        await FileService.MadeTextFile(appList);
+    }
+    public static async Task StopApp(string appName)
+    {
+        try
+        {
+            var processes = Process.GetProcessesByName(appName); 
             foreach (var process in processes)
             {
                 process.Kill(true);
             }
-            //EmailService.SendResultLAN("App Service", "Stopped app: " + appName);
+            await RespondService.SendMessageToWeb("App stopped: " + appName);
         }
         catch (Exception ex)
         {
-            //EmailService.SendResultLAN("App Service", "Error stopping app: " + appName + " - " + ex.Message);
+            await RespondService.SendMessageToWeb("Error stopping app: " + appName + " - " + ex.Message);
         }
     }
-    public static void StartApp(string appName)
+    public static async Task StartApp(string appName)
     {
-        DriveInfo[] allDrives = DriveInfo.GetDrives(); // Get all disk drives
-        appName = appName + ".exe"; // Ensure the app name has .exe extension
+        DriveInfo[] allDrives = DriveInfo.GetDrives(); 
+        appName = appName + ".exe"; 
         foreach (var drive in allDrives)
         {
-            if (!drive.IsReady || drive.DriveType != DriveType.Fixed) continue; // Skip if drive is not ready, or not a fixed drive
+            if (!drive.IsReady || drive.DriveType != DriveType.Fixed) continue; 
             try
             {
                 var options = new EnumerationOptions
                 {
-                    RecurseSubdirectories = true, // Search in subdirectories
-                    IgnoreInaccessible = true, // Ignore inaccessible directories
+                    RecurseSubdirectories = true, 
+                    IgnoreInaccessible = true, 
                     MatchCasing = MatchCasing.CaseInsensitive
                 };
-                var filePath = Directory.EnumerateFiles(drive.RootDirectory.FullName, appName, options).FirstOrDefault(); // Find and return the first found file
+                var filePath = Directory.EnumerateFiles(drive.RootDirectory.FullName, appName, options).FirstOrDefault(); 
                 if (filePath != null)
                 {
                     try
@@ -41,24 +58,25 @@ public static class AppService
                         Process.Start(new ProcessStartInfo
                         {
                             FileName = filePath,
-                            UseShellExecute = true, // Use shell to start the process
-                            Verb = "runas" // Run as administrator
+                            UseShellExecute = true, 
+                            Verb = "runas" 
                         });
-                        //EmailService.SendResultLAN("Find App Service", "App started: " + filePath);
+                        await RespondService.SendMessageToWeb("App started: " + filePath);
+                        return;
                     }
                     catch (Exception ex)
                     {
-                        //EmailService.SendResultLAN("Find App Service", "Error accessing file: " + filePath + " - " + ex.Message);
+                        await RespondService.SendMessageToWeb("Error starting app: " + filePath + " - " + ex.Message);
                     }
                 }
                 else
                 {
-                    //EmailService.SendResultLAN("Find App Service", "App not found: " + appName);
+                    await RespondService.SendMessageToWeb("App not found: " + appName);
                 }
             }
             catch (Exception ex)
             {
-                //EmailService.SendResultLAN("Find App Service", "Error accessing drive: " + drive.Name + " - " + ex.Message);
+                await RespondService.SendMessageToWeb("Error accessing drive: " + drive.Name + " - " + ex.Message);
                 continue;
             }
         }
