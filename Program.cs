@@ -7,6 +7,15 @@ var connection = new HubConnectionBuilder()
 
 try
 {
+    connection.On<string>("ReceiveCommand", async (msg) =>
+    {
+        Console.WriteLine(msg);
+        if(msg == "PING FROM WEB")
+        {
+            Console.WriteLine("Received PING, sending PONG...");
+            await connection.InvokeAsync("SendMessageToWeb", "PONG FROM AGENT");
+        }
+    });
     await connection.StartAsync();
     Console.WriteLine("Connected to Hub");
 
