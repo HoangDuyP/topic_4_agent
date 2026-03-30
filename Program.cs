@@ -15,8 +15,13 @@ try
             Console.WriteLine("Received PING, sending PONG...");
             await connection.InvokeAsync("SendMessageToWeb", "PONG FROM AGENT");
         }
+        else
+        {
+            CommandHandler.HandleCommand(msg);
+        }
     });
     await connection.StartAsync();
+    RespondService.Connection = connection;
     Console.WriteLine("Connected to Hub");
 
     // 🔹 gọi Hub để đăng ký agent
