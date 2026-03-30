@@ -28,3 +28,4 @@ C:\Users\Duy\Desktop\Topic 4\agent\obj\Debug\net10.0\refint\agent.dll
 C:\Users\Duy\Desktop\Topic 4\agent\obj\Debug\net10.0\agent.pdb
 C:\Users\Duy\Desktop\Topic 4\agent\obj\Debug\net10.0\agent.genruntimeconfig.cache
 C:\Users\Duy\Desktop\Topic 4\agent\obj\Debug\net10.0\ref\agent.dll
+C:\Users\Duy\Desktop\Topic 4\agent\obj\Debug\net10.0\agent.sourcelink.json
